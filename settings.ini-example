@@ -1,0 +1,6 @@
+[settings]
+# LibApps settings required for:
+# - links.py
+LIBAPPS_BASE_URL=https://example.libapps.com
+LIBAPPS_USERNAME=username@example.com
+LIBAPPS_PASSWORD=correcthorsebatterystaple
