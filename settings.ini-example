@@ -4,3 +4,8 @@
 LIBAPPS_BASE_URL=https://example.libapps.com
 LIBAPPS_USERNAME=username@example.com
 LIBAPPS_PASSWORD=correcthorsebatterystaple
+LIBGUIDES_API_SITE_ID=123
+LIBGUIDES_API_KEY=abcdef1234567890abcdef1234567890
+CURRENT_PREFIX=https://go.example.net/redirector/example.edu?url=
+FORMER_PREFIX=https://example.idm.example.org/login?url=
+EXCEPTION_DOMAINS=exception1.example.com,exception2.example.com,exception3.example.com,exception4.example.com
