@@ -19,6 +19,7 @@ from playwright.sync_api import (
 
 
 def main(
+    dry_run: ("dry run", "flag", "d"),  # type: ignore
     csv_file: "path to csv file",  # type: ignore
 ):
     with sync_playwright() as playwright:
@@ -44,7 +45,12 @@ def main(
                         "Showing 1 to 25"
                     )
                     # page.screenshot(path=f'_outputs/url_prxy_dcd/{row["ID"]}-reset.png')
-                    print(row["ID"], row["Name"])
+                    print("\n")
+                    if row["proxy_toggle"] == "1":
+                        use_proxy = "Yes"
+                    else:
+                        use_proxy = "No"
+                    print(row["ID"], f"[Use Proxy? {use_proxy}]", row["Name"])
                     print(row["URL"])
                     if row["URL"].startswith(config("CURRENT_PREFIX")):
                         replacement_url = urllib.parse.unquote(
@@ -73,22 +79,28 @@ def main(
                         exception_domain = contains_exception_domain(replacement_url)
                         if exception_domain:
                             print(
-                                f"Toggle “Use Proxy?” ❌ No [Exception: {exception_domain}]"
+                                f"Toggle “Use Proxy?” to ❌ No [Exception: {exception_domain}]"
                             )
-                            print("\n")
                             # NOTE clicking the label rather than the input works
                             page.locator("#label-enable_proxy_0").click()
-                            # page.get_by_role("button", name="Cancel").click()
+                            page.screenshot(
+                                path=f'_outputs/url_prxy_dcd/{row["ID"]}-pre-save.png'
+                            )
+                            if dry_run:
+                                page.get_by_role("button", name="Cancel").click()
+                                continue
                             page.get_by_role("button", name="Save").click()
                             continue
                         if row["proxy_toggle"] != "1":
-                            print("Toggle “Use Proxy?” ✅ Yes")
+                            print("Toggle “Use Proxy?” to ✅ Yes")
                             # NOTE clicking the label rather than the input works
                             page.locator("#label-enable_proxy_1").click()
                         page.screenshot(
                             path=f'_outputs/url_prxy_dcd/{row["ID"]}-pre-save.png'
                         )
-                        # page.get_by_role("button", name="Cancel").click()
+                        if dry_run:
+                            page.get_by_role("button", name="Cancel").click()
+                            continue
                         page.get_by_role("button", name="Save").click()
                     elif row["URL"].startswith(config("FORMER_PREFIX")):
                         replacement_url = urllib.parse.unquote(
@@ -117,25 +129,31 @@ def main(
                         exception_domain = contains_exception_domain(replacement_url)
                         if exception_domain:
                             print(
-                                f"Toggle “Use Proxy?” ❌ No [Exception: {exception_domain}]"
+                                f"Toggle “Use Proxy?” to ❌ No [Exception: {exception_domain}]"
                             )
-                            print("\n")
                             # NOTE clicking the label rather than the input works
                             page.locator("#label-enable_proxy_0").click()
-                            # page.get_by_role("button", name="Cancel").click()
+                            page.screenshot(
+                                path=f'_outputs/url_prxy_dcd/{row["ID"]}-pre-save.png'
+                            )
+                            if dry_run:
+                                page.get_by_role("button", name="Cancel").click()
+                                continue
                             page.get_by_role("button", name="Save").click()
                             continue
                         if row["proxy_toggle"] != "1":
-                            print("Toggle “Use Proxy?” ✅ Yes")
+                            print("Toggle “Use Proxy?” to ✅ Yes")
                             # NOTE clicking the label rather than the input works
                             page.locator("#label-enable_proxy_1").click()
                         page.screenshot(
                             path=f'_outputs/url_prxy_dcd/{row["ID"]}-pre-save.png'
                         )
-                        # page.get_by_role("button", name="Cancel").click()
+                        if dry_run:
+                            page.get_by_role("button", name="Cancel").click()
+                            continue
                         page.get_by_role("button", name="Save").click()
                     elif row["proxy_toggle"] == "1":
-                        print(f"Toggle “Use Proxy?” ❌ No")
+                        print(f"Toggle “Use Proxy?” to ❌ No")
                         page.get_by_role("textbox", name="ID").fill(row["ID"])
                         page.keyboard.up("ArrowRight")
                         expect(page.get_by_role("status")).to_contain_text(
@@ -154,11 +172,13 @@ def main(
                         page.screenshot(
                             path=f'_outputs/url_prxy_dcd/{row["ID"]}-pre-save.png'
                         )
-                        # page.get_by_role("button", name="Cancel").click()
+                        if dry_run:
+                            page.get_by_role("button", name="Cancel").click()
+                            continue
                         page.get_by_role("button", name="Save").click()
                     else:
                         print("No changes needed ⛔️")
-                    print("\n")
+            print("\n")
             browser.close()
         except PlaywrightTimeoutError as e:
             print(e)
