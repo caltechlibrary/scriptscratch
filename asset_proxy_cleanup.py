@@ -79,11 +79,11 @@ def main(
                 page.fill("#s-libapps-password", config("LIBAPPS_PASSWORD"))
                 page.click("#s-libapps-login-button")
                 page.wait_for_load_state("networkidle")
-                page.goto("/libguides/assets.php")
             for asset in data:
                 if (
                     types[asset["type_id"]] != "Link"
                     and types[asset["type_id"]] != "Book from the Catalog"
+                    and types[asset["type_id"]] != "Database"
                 ):
                     continue
                 # NOTE reset loop variables
@@ -107,6 +107,10 @@ def main(
                             print(f"[Exception: {exception_domain}]")
                             print("➡️  Toggle “Use Proxy?” to No")
                     elif update:
+                        if types[asset["type_id"]] == "Database":
+                            page.goto("/libguides/az.php")
+                        else:
+                            page.goto("/libguides/assets.php")
                         # NOTE reset search
                         page.get_by_role("textbox", name="ID").fill("")
                         page.keyboard.up("ArrowRight")
@@ -157,6 +161,10 @@ def main(
                             f"➡️  Toggle “Use Proxy?” to No [Exception: {exception_domain}]"
                         )
                     if update:
+                        if types[asset["type_id"]] == "Database":
+                            page.goto("/libguides/az.php")
+                        else:
+                            page.goto("/libguides/assets.php")
                         # NOTE reset search
                         page.get_by_role("textbox", name="ID").fill("")
                         page.keyboard.up("ArrowRight")
