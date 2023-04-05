@@ -49,6 +49,7 @@ types = {
 
 def main(
     update: ("update records", "flag", "u"),  # type: ignore
+    dry_run: ("mock update without saving", "flag", "d"),  # type: ignore
 ):
 
     # LibGuides API Response
@@ -129,8 +130,12 @@ def main(
                             # NOTE clicking the label rather than the input works
                             page.locator("#label-enable_proxy_0").click()
                             toggled = f"☑️  Toggled “Use Proxy?” to No [Exception: {exception_domain}]"
-                        page.get_by_role("button", name="Save").click()
-                        print("☑️  Replaced URL", working_url)
+                        if dry_run:
+                            page.get_by_role("button", name="Cancel").click()
+                            print("🐞 Replaced URL", working_url)
+                        else:
+                            page.get_by_role("button", name="Save").click()
+                            print("☑️  Replaced URL", working_url)
                         if toggled:
                             print(toggled)
                 elif exception_domain and use_proxy == "Yes":
@@ -155,10 +160,16 @@ def main(
                         page.locator("#form-group-enable_proxy").wait_for()
                         # NOTE clicking the label rather than the input works
                         page.locator("#label-enable_proxy_0").click()
-                        page.get_by_role("button", name="Save").click()
-                        print(
-                            f"☑️  Toggled “Use Proxy?” to No [Exception: {exception_domain}]"
-                        )
+                        if dry_run:
+                            page.get_by_role("button", name="Cancel").click()
+                            print(
+                                f"🐞 Toggled “Use Proxy?” to No [Exception: {exception_domain}]"
+                            )
+                        else:
+                            page.get_by_role("button", name="Save").click()
+                            print(
+                                f"☑️  Toggled “Use Proxy?” to No [Exception: {exception_domain}]"
+                            )
             if update:
                 browser.close()
             print("")
