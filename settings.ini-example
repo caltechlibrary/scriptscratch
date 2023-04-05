@@ -9,3 +9,4 @@ LIBGUIDES_API_KEY=abcdef1234567890abcdef1234567890
 CURRENT_PREFIX=https://go.example.net/redirector/example.edu?url=
 FORMER_PREFIX=https://example.idm.example.org/login?url=
 EXCEPTION_DOMAINS=exception1.example.com,exception2.example.com,exception3.example.com,exception4.example.com
+PROXY_PREFIXES=https://go.example.net/redirector/example.edu?url=,https://example.idm.example.org/login?url=

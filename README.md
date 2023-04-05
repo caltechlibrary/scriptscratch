@@ -21,6 +21,25 @@ This file demonstrates using the Selenium IDE browser extension to set up exampl
 
 The base `url` key should be updated when using it in Selenium. It also assumes a user is already logged in to LibApps in the browser.
 
+## `asset_proxy_cleanup.py`
+
+This script will report on assets in LibGuides with URLs that are proxied
+inappropriately. Link and Book assets will be checked for a proxy prefix on the
+URL or for a URL with a domain in the exception list that should not be proxied.
+The `--update` flag will update the assets with the appropriate changes.
+
+Required values in `settings.ini` include:
+
+- `LIBGUIDES_API_SITE_ID`
+- `LIBGUIDES_API_KEY`
+- `PROXY_PREFIXES`
+- `EXCEPTION_DOMAINS`
+- `LIBAPPS_BASE_URL` [with `--update` only]
+- `LIBAPPS_USERNAME` [with `--update` only]
+- `LIBAPPS_PASSWORD` [with `--update` only]
+
+Usage: `python asset_proxy_cleanup.py [--update]`
+
 ## `url_proxy_decode.py`
 
 Usage: `python url_proxy_decode.py _inputs/file.csv`
