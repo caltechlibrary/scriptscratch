@@ -67,6 +67,8 @@ def main(
     with sync_playwright() as playwright:
         try:
             if update:
+                if dry_run:
+                    print("🐞 DRY RUN: no changes will be saved")
                 browser = playwright.firefox.launch()
                 page = browser.new_page(
                     base_url=config("LIBAPPS_BASE_URL"),
@@ -132,10 +134,9 @@ def main(
                             toggled = f"☑️  Toggled “Use Proxy?” to No [Exception: {exception_domain}]"
                         if dry_run:
                             page.get_by_role("button", name="Cancel").click()
-                            print("🐞 Replaced URL", working_url)
                         else:
                             page.get_by_role("button", name="Save").click()
-                            print("☑️  Replaced URL", working_url)
+                        print("☑️  Replaced URL", working_url)
                         if toggled:
                             print(toggled)
                 elif exception_domain and use_proxy == "Yes":
@@ -162,16 +163,15 @@ def main(
                         page.locator("#label-enable_proxy_0").click()
                         if dry_run:
                             page.get_by_role("button", name="Cancel").click()
-                            print(
-                                f"🐞 Toggled “Use Proxy?” to No [Exception: {exception_domain}]"
-                            )
                         else:
                             page.get_by_role("button", name="Save").click()
-                            print(
-                                f"☑️  Toggled “Use Proxy?” to No [Exception: {exception_domain}]"
-                            )
+                        print(
+                            f"☑️  Toggled “Use Proxy?” to No [Exception: {exception_domain}]"
+                        )
             if update:
                 browser.close()
+                if dry_run:
+                    print("🐞 DRY RUN: no changes were saved")
             print("")
         except PlaywrightTimeoutError as e:
             print(e)
