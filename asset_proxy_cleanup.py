@@ -68,10 +68,11 @@ def main(
         try:
             if update:
                 if dry_run:
-                    print("🐞 DRY RUN: no changes will be saved")
+                    print("\n🐞 DRY RUN: no changes will be saved")
                 browser = playwright.firefox.launch()
                 page = browser.new_page(
                     base_url=config("LIBAPPS_BASE_URL"),
+                    record_video_dir="_outputs",
                 )
                 page.goto("/libapps/login.php")
                 page.fill("#s-libapps-email", config("LIBAPPS_USERNAME"))
@@ -117,7 +118,14 @@ def main(
                         expect(page.get_by_role("status")).to_contain_text(
                             "Showing 1 to 1 of 1 entries"
                         )
+                        page.screenshot(
+                            path=f'_outputs/{asset["id"]}-filtered.png'
+                        )
                         page.get_by_title("Edit Item").click()
+                        page.locator("#form-group-enable_proxy").wait_for()
+                        page.screenshot(
+                            path=f'_outputs/{asset["id"]}-pre-edit.png'
+                        )
                         if "Link" in types[asset["type_id"]]:
                             page.get_by_label("Link URL").fill(working_url)
                         elif "Book" in types[asset["type_id"]]:
@@ -132,6 +140,9 @@ def main(
                             # NOTE clicking the label rather than the input works
                             page.locator("#label-enable_proxy_0").click()
                             toggled = f"☑️  Toggled “Use Proxy?” to No [Exception: {exception_domain}]"
+                        page.screenshot(
+                            path=f'_outputs/{asset["id"]}-pre-save.png'
+                        )
                         if dry_run:
                             page.get_by_role("button", name="Cancel").click()
                         else:
@@ -157,10 +168,19 @@ def main(
                         expect(page.get_by_role("status")).to_contain_text(
                             "Showing 1 to 1 of 1 entries"
                         )
+                        page.screenshot(
+                            path=f'_outputs/{asset["id"]}-filtered.png'
+                        )
                         page.get_by_title("Edit Item").click()
                         page.locator("#form-group-enable_proxy").wait_for()
+                        page.screenshot(
+                            path=f'_outputs/{asset["id"]}-pre-edit.png'
+                        )
                         # NOTE clicking the label rather than the input works
                         page.locator("#label-enable_proxy_0").click()
+                        page.screenshot(
+                            path=f'_outputs/{asset["id"]}-pre-save.png'
+                        )
                         if dry_run:
                             page.get_by_role("button", name="Cancel").click()
                         else:
@@ -171,7 +191,7 @@ def main(
             if update:
                 browser.close()
                 if dry_run:
-                    print("🐞 DRY RUN: no changes were saved")
+                    print("\n🐞 DRY RUN: no changes were saved")
             print("")
         except PlaywrightTimeoutError as e:
             print(e)
