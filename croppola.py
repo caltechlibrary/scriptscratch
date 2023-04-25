@@ -10,6 +10,7 @@ import requests
 
 def main(
     directory: "path to image directory",  # type: ignore
+    upscale: ("upscale images with smaller dimensions", "flag", "u"),  # type: ignore
 ):
     count = 1
     for p in Path(directory).iterdir():
@@ -17,31 +18,46 @@ def main(
             count += 1
             print("⛔️", p)
             continue
-        if p.suffix == ".gif" or p.suffix == ".jpg" or p.suffix == ".png":
+        if p.suffix == ".jpg" or p.suffix == ".png":
             print(p)
             with open(p, "rb") as fp:
-                data = fp.read()
+                binary_image_content = fp.read()
         else:
             count += 1
             print("⛔️", p)
             continue
 
         # smart square thumbnail "showing the most interesting part of the image"
-        url = "https://croppola.com/croppola/image.jpg"
-        params = {
-            "aspectRatio": "1.0",
-            "minimumHeight": "80%",
-            "scaledMaximumWidth": "400",
-            "algorithm": "croppola",
-        }
-        response = requests.post(url, params=params, data=data)
+        info_url = "https://croppola.com/croppola/image.json"
+        crop_url = "https://croppola.com/croppola/image.jpg"
+        thumbnail_filename = f"{p.stem}--thumbnail{p.suffix}"
+        if upscale:
+            arguments = {
+                "aspectRatio": "1.0",
+                "scaledHeight": "400",
+                "scaledWidth": "400",
+                "algorithm": "croppola",
+            }
+            info_response = requests.post(info_url, params=arguments, data=binary_image_content).json()
+            if info_response["imageHeight"] < 400 or info_response["imageWidth"] < 400:
+                thumbnail_filename = f"{p.stem}--thumbnail-upscaled{p.suffix}"
+            crop_url = f'https://croppola.com/croppola/{info_response["token"]}/image.jpg'
+            crop_response = requests.post(crop_url, params=arguments, data=binary_image_content)
+        else:
+            arguments = {
+                "aspectRatio": "1.0",
+                "minimumHeight": "80%",
+                "scaledMaximumWidth": "400",
+                "algorithm": "croppola",
+            }
+            crop_response = requests.post(crop_url, params=arguments, data=binary_image_content)
 
         # save the thumbnail
-        if response.status_code == 200:
-            with open(f"{directory}/{p.stem}--thumbnail{p.suffix}", "wb") as f:
-                f.write(response.content)
+        if crop_response.status_code == 200:
+            with open(f"{directory}/{thumbnail_filename}", "wb") as f:
+                f.write(crop_response.content)
         else:
-            print("❌ error " + str(response.status_code))
+            print(f"❌ error {str(crop_response.status_code)}\n{crop_response.text}")
 
         count += 1
 
